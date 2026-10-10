@@ -1,0 +1,12 @@
+{
+  "name": "dark-chess-chain",
+  "version": "1.0.0",
+  "description": "網頁版台灣暗棋：一般規則、連棋（連吃）模式、對電腦、線上雙人",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "build": "node build.js",
+    "test": "node test/rules.js && node test/selfplay.js chain normal easy 2"
+  },
+  "engines": { "node": ">=16" }
+}

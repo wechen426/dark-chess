@@ -1,0 +1,9 @@
+# Render 一鍵部署設定：在 Render 選 New → Blueprint，指向放了本專案的 GitHub repo
+services:
+  - type: web
+    name: dark-chess-chain
+    runtime: node
+    plan: free
+    buildCommand: "true"
+    startCommand: node server/server.js
+    healthCheckPath: /

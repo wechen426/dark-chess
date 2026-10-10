@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>暗棋連棋</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&family=Noto+Serif+TC:wght@900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="client/style.css">
+</head>
+<body>
+<!--APP-START-->
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>暗棋連棋</h1>
+      <span>台灣半盤暗棋・32 子・4 × 8</span>
+    </div>
+    <div class="status" id="status" aria-live="polite"><span class="dot" id="statusDot"></span><span id="statusText">準備中</span></div>
+  </header>
+
+  <main class="layout">
+    <section class="board-shell" aria-label="棋盤">
+      <div class="player-strip">
+        <div class="player-tag" id="tag1"><span id="name1">電腦</span><span class="chip" id="chip1">未定色</span></div>
+        <div class="tray" id="tray1" aria-label="吃下的棋子"></div>
+      </div>
+      <div class="board-stage">
+        <div class="board horizontal" id="board" role="grid"></div>
+        <div class="turn-banner" id="turnBanner" aria-live="polite" hidden>
+          <div class="banner-disc" id="bannerDisc"></div>
+          <div><div class="banner-title" id="bannerTitle"></div><div class="banner-sub" id="bannerSub"></div></div>
+        </div>
+      </div>
+      <div class="chain-bar" id="chainBar" hidden>
+        <span>連吃中：可繼續吃子，或結束回合</span>
+        <button class="btn primary" id="endChain" type="button">結束回合</button>
+      </div>
+      <div class="player-strip">
+        <div class="player-tag" id="tag0"><span id="name0">你</span><span class="chip" id="chip0">未定色</span></div>
+        <div class="tray" id="tray0" aria-label="吃下的棋子"></div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="card">
+        <h2>新對局</h2>
+        <div class="field"><span class="lab">規則</span>
+          <div class="seg" data-key="rule">
+            <button type="button" id="ruleClassic" data-val="classic">一般暗棋</button>
+            <button type="button" id="ruleChain" data-val="chain">連棋（可連吃）</button>
+          </div>
+        </div>
+        <div class="field"><span class="lab">對手</span>
+          <div class="seg" data-key="opp">
+            <button type="button" id="oppAi" data-val="ai">電腦</button>
+            <button type="button" id="oppLocal" data-val="local">同機雙人</button>
+            <button type="button" id="oppOnline" data-val="online">線上雙人</button>
+          </div>
+        </div>
+        <div class="field" id="aiOpts"><span class="lab">電腦難度</span>
+          <div class="seg" data-key="level">
+            <button type="button" id="lvEasy" data-val="easy">入門</button>
+            <button type="button" id="lvNormal" data-val="normal">一般</button>
+            <button type="button" id="lvHard" data-val="hard">高手</button>
+          </div>
+        </div>
+        <div class="field" id="firstOpts"><span class="lab">先手</span>
+          <div class="seg" data-key="first">
+            <button type="button" id="firstMe" data-val="me">我先</button>
+            <button type="button" id="firstAi" data-val="ai">電腦先</button>
+          </div>
+        </div>
+        <div id="localStart" class="row">
+          <button class="btn primary" id="startBtn" type="button">開始新局</button>
+          <button class="btn" id="undoBtn" type="button">悔棋</button>
+        </div>
+        <div id="onlineBox" class="field" hidden>
+          <div class="field" id="serverField">
+            <label for="serverUrl">連線伺服器</label>
+            <div class="row"><input type="text" id="serverUrl" spellcheck="false" autocomplete="off"></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="createRoom" type="button">建立房間</button>
+          </div>
+          <div class="row">
+            <input type="text" id="roomInput" placeholder="輸入 4 碼房號" maxlength="4" autocomplete="off" inputmode="numeric">
+            <button class="btn" id="joinRoom" type="button">加入</button>
+          </div>
+          <div id="roomShow" hidden><span class="note">房號（請告訴對手）</span><div class="room-code" id="roomCode"></div></div>
+          <p class="note" id="netNote">線上對戰需要先啟動本專案的連線伺服器（node server/server.js）。</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>棋譜</h2>
+        <p class="note">未吃子／未翻棋步數 <span class="counter" id="idle">0</span> / 50（到 50 判和）</p>
+        <ol class="log" id="log"></ol>
+      </div>
+
+      <div class="card">
+        <details class="rules">
+          <summary>規則說明</summary>
+          <ul>
+            <li>32 子全部蓋著隨機排在 4 × 8 棋盤上，第一個翻棋的人拿到翻出的顏色。</li>
+            <li>每回合可以翻一顆暗棋，或移動一顆自己的明棋（上下左右一格）。</li>
+            <li>大小：<span class="rank">帥將 &gt; 仕士 &gt; 相象 &gt; 俥車 &gt; 傌馬 &gt; 炮包 &gt; 兵卒</span>，大吃小、同級可互吃。</li>
+            <li>例外：兵卒可以吃帥將，帥將不能吃兵卒。</li>
+            <li>炮包：平常走一格；吃子時必須隔一顆棋（明暗都可當炮架）跳過去吃，距離不限，可吃任何棋子。</li>
+            <li>只能吃已翻開的棋子。</li>
+            <li>連棋模式：任何一次吃子後，同一顆棋還有目標就可以繼續連吃。明棋可以攻擊上下左右相鄰的暗棋。翻開後是吃得掉的敵棋（同級或較小，或兵卒對帥將）就吃掉，並可繼續攻擊相鄰暗棋；翻出自己的棋就停止；翻出比自己大的敵棋，攻擊的棋陣亡。炮包要隔一顆棋跳著攻擊暗棋，翻出敵棋一律吃掉。連吃途中，同一顆棋也可以吃相鄰吃得掉的敵方明棋（同級可吃，先動先吃），吃完可繼續；想停可按「結束回合」。</li>
+            <li>吃光對方或對方無棋可走就贏；連續 50 手沒有翻棋或吃子判和。</li>
+          </ul>
+        </details>
+      </div>
+    </aside>
+  </main>
+</div>
+<!--APP-END-->
+<script src="shared/engine.js"></script>
+<script src="shared/ai.js"></script>
+<script src="client/app.js"></script>
+</body>
+</html>
