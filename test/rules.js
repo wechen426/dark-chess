@@ -78,4 +78,9 @@ const c = s.board[10].c; G.apply(s, { type: 'flip', at: 10 });
 assert.strictEqual(s.colors[0], c);
 // 遮蔽：暗棋內容不外洩
 assert(G.masked(s).board.every(p => !p || p.up || p.t === undefined));
+// 投降：對手獲勝，之後不能再下
+s = G.newGame({ seed: 3 }); G.apply(s, { type: 'flip', at: 5 });
+G.resign(s, 1);
+assert.strictEqual(s.winner, 0); assert.strictEqual(s.last.type, 'resign');
+assert.strictEqual(G.legalActions(s).length, 0);
 console.log('規則測試全部通過');

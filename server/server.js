@@ -128,6 +128,10 @@ server.on('upgrade', (req, socket) => {
       G.apply(s, action);
       const masked = G.masked(s);
       room.players.forEach(p => send(p, { type: 'state', state: masked }));
+    } else if (m.type === 'resign' && room && room.state && room.state.winner === null && room.players[1]) {
+      G.resign(room.state, room.seatOf[idx]);
+      const masked = G.masked(room.state);
+      room.players.forEach(p => send(p, { type: 'state', state: masked }));
     } else if (m.type === 'rematch' && room && room.state && room.state.winner !== null && room.players[1]) {
       room.firstSeat = 1 - room.firstSeat;
       startGame(room);

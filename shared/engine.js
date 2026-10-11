@@ -316,6 +316,18 @@
 
   function pieceName(pc) { return NAMES[pc.c][pc.t]; }
 
+  // 投降：player 認輸，對手獲勝（不算一般動作，任何時候都可以投降）
+  function resign(s, player) {
+    if (s.winner !== null) return s;
+    s.chain = null;
+    s.chainCount = 0;
+    s.winner = 1 - player;
+    var col = s.colors[player];
+    s.reason = (col ? COLOR_NAME[col] + '方' : '玩家' + (player + 1)) + '投降';
+    s.last = { type: 'resign', player: player };
+    return s;
+  }
+
   function describe(last) {
     if (!last) return '';
     var who = '玩家' + (last.player + 1);
@@ -323,13 +335,14 @@
     if (last.type === 'move') return who + ' ' + pieceName(last.piece) + ' 移動';
     if (last.type === 'capture') return who + ' ' + pieceName(last.piece) + ' 吃 ' + pieceName(last.victim) + (last.chain > 1 ? '（連吃第 ' + last.chain + ' 子）' : '');
     if (last.type === 'end') return who + ' 結束連吃';
+    if (last.type === 'resign') return who + ' 投降';
     return '';
   }
 
   return {
     ROWS: ROWS, COLS: COLS, SIZE: SIZE, RANK: RANK, COUNTS: COUNTS, NAMES: NAMES,
     COLOR_NAME: COLOR_NAME, NEIGHBORS: NEIGHBORS, NO_PROGRESS_LIMIT: NO_PROGRESS_LIMIT,
-    newGame: newGame, clone: clone, legalActions: legalActions, isLegal: isLegal,
+    newGame: newGame, clone: clone, resign: resign, legalActions: legalActions, isLegal: isLegal,
     apply: apply, masked: masked, hiddenPool: hiddenPool, capturesFrom: capturesFrom,
     outranks: outranks, attacksFrom: attacksFrom, pieceName: pieceName, describe: describe, remaining: remaining
   };

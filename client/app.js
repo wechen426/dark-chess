@@ -141,6 +141,7 @@
         l.result === 'own' ? '（自己的棋），停止' : '，' + G.pieceName(l.piece) + '陣亡');
     }
     else if (l.type === 'end') text = who + '結束連吃';
+    else if (l.type === 'resign') text = who + '投降';
     logItems.push(text);
   }
   function coord(i) { return 'ABCD'[(i / 8) | 0] + ((i % 8) + 1); }
@@ -185,6 +186,46 @@
       if (!ok || game.winner !== null || game.turn === humanSeat) return;
       aiTimer = setTimeout(function () { playSeq(seq, k + 1); }, 300);
     });
+  }
+
+  // ---------- 投降 ----------
+  // 第一次按下先變成「確定投降？」，避免誤觸；3 秒內沒確認就恢復
+  var resignArmed = false, resignTimer = null;
+  function canResign() {
+    if (!game || game.winner !== null) return false;
+    if (playMode === 'online') return net.connected && net.seat != null;
+    return true;
+  }
+  function resignSeat() {
+    if (playMode === 'ai') return humanSeat;
+    if (playMode === 'online') return net.seat;
+    return game.turn; // 同機雙人：輪到的人投降
+  }
+  function disarmResign() {
+    resignArmed = false; clearTimeout(resignTimer);
+    $('resignBtn').textContent = '投降';
+    $('resignBtn').classList.remove('danger');
+    $('resignCancel').hidden = true;
+  }
+  function onResign() {
+    if (!canResign()) return;
+    if (!resignArmed) {
+      resignArmed = true;
+      $('resignBtn').textContent = '確定投降？';
+      $('resignBtn').classList.add('danger');
+      $('resignCancel').hidden = false;
+      resignTimer = setTimeout(disarmResign, 3000);
+      return;
+    }
+    disarmResign();
+    if (playMode === 'online') { send({ type: 'resign' }); return; }
+    clearTimeout(aiTimer); aiThinking = false;
+    epoch++; busy = false; view = null; $('turnBanner').hidden = true;
+    selected = null;
+    G.resign(game, resignSeat());
+    addLog(game);
+    prevBoardKey = '';
+    render();
   }
 
   function undo() {
@@ -321,6 +362,8 @@
     });
 
     $('chainBar').hidden = !(game.chain !== null && humanCanAct());
+    $('gameActions').hidden = !canResign();
+    $('resignLabel').textContent = playMode === 'local' ? '輪到的一方可以投降' : '';
 
     // 狀態列
     var dot = $('statusDot'), txt;
@@ -360,7 +403,8 @@
     var box = document.createElement('div'); box.className = 'box';
     var s = document.createElement('strong');
     s.textContent = game.winner === 'draw' ? '和局' : seatName(game.winner) + '獲勝';
-    var p = document.createElement('span'); p.textContent = game.reason;
+    var p = document.createElement('span');
+    p.textContent = game.last && game.last.type === 'resign' ? seatName(game.last.player) + '投降' + (game.colors[game.last.player] ? '（' + G.COLOR_NAME[game.colors[game.last.player]] + '方）' : '') : game.reason;
     var btn = document.createElement('button'); btn.className = 'btn primary'; btn.type = 'button';
     btn.textContent = '再來一局';
     btn.addEventListener('click', function (e) {
@@ -383,6 +427,8 @@
   $('endChain').addEventListener('click', function () { if (humanCanAct() && game.chain !== null) doAction({ type: 'end' }); });
   $('startBtn').addEventListener('click', startLocal);
   $('undoBtn').addEventListener('click', undo);
+  $('resignBtn').addEventListener('click', onResign);
+  $('resignCancel').addEventListener('click', disarmResign);
   window.addEventListener('resize', render);
 
   // ---------- 線上對戰 ----------
@@ -564,6 +610,11 @@
       if (d.order[s.turn] !== clientId || !G.isLegal(s, m.action)) return;
       G.apply(s, m.action);
       cloudWrite({ state: JSON.parse(JSON.stringify(s)), seq: d.seq + 1 });
+    } else if (m.type === 'resign') {
+      var seat = d.order.indexOf(clientId);
+      if (seat < 0 || d.state.winner !== null) return;
+      var rs = G.resign(plainState(d.state), seat);
+      cloudWrite({ state: JSON.parse(JSON.stringify(rs)), seq: d.seq + 1 });
     } else if (m.type === 'rematch') {
       if (d.state.winner === null || d.order.indexOf(clientId) < 0) return;
       // 再來一局：交換先手

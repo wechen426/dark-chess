@@ -242,6 +242,10 @@ main.layout {
   background: var(--panel); border: 1px solid var(--accent);
 }
 
+/* 投降 */
+.game-actions { width: 100%; display: flex; gap: 8px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.btn.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+
 /* 側欄 */
 aside.side { display: grid; gap: 14px; min-width: 0; }
 .card {
