@@ -419,7 +419,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
             <li>例外：兵卒可以吃帥將，帥將不能吃兵卒。</li>
             <li>炮包：平常走一格；吃子時必須隔一顆棋（明暗都可當炮架）跳過去吃，距離不限，可吃任何棋子。</li>
             <li>只能吃已翻開的棋子。</li>
-            <li>連棋模式：任何一次吃子後，同一顆棋還有目標就可以繼續連吃。明棋可以攻擊上下左右相鄰的暗棋。翻開後是吃得掉的敵棋（同級或較小，或兵卒對帥將）就吃掉，並可繼續攻擊相鄰暗棋；翻出自己的棋就停止；翻出比自己大的敵棋，攻擊的棋陣亡。炮包要隔一顆棋跳著攻擊暗棋，翻出敵棋一律吃掉。連吃途中，同一顆棋也可以吃相鄰吃得掉的敵方明棋（同級可吃，先動先吃），吃完可繼續；想停可按「結束回合」。</li>
+            <li>連棋模式：任何一次吃子後，同一顆棋還有目標就可以繼續連吃。明棋可以攻擊上下左右相鄰的暗棋。翻開後是吃得掉的敵棋（同級或較小，或兵卒對帥將）就吃掉，並可繼續攻擊相鄰暗棋；翻出自己的棋就停止；翻出比自己大的敵棋，攻擊的棋停在原地，回合結束。炮包要隔一顆棋跳著攻擊暗棋，翻出敵棋一律吃掉。連吃途中，同一顆棋也可以吃相鄰吃得掉的敵方明棋（同級可吃，先動先吃），吃完可繼續；想停可按「結束回合」。</li>
             <li>吃光對方或對方無棋可走就贏；連續 50 手沒有翻棋或吃子判和。</li>
           </ul>
         </details>
@@ -678,7 +678,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
       s.last = { type: 'flip', at: a.at, player: me, piece: { t: pc.t, c: pc.c } };
       endTurn(s);
     } else if (a.type === 'move' && s.board[a.to] && !s.board[a.to].up) {
-      // 連棋：攻擊暗棋。翻開後：可吃的敵棋→吃掉並可續攻；自己的棋→停止；比自己大的敵棋→己方陣亡
+      // 連棋：攻擊暗棋。翻開後：可吃的敵棋→吃掉並可續攻；自己的棋→停止；比自己大的敵棋→停在原地，回合結束
       var att = s.board[a.from], hid = s.board[a.to];
       hid.up = true;
       s.noProgress = 0;
@@ -690,9 +690,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
         s.board[a.to] = att; s.board[a.from] = null;
         s.captured[hid.c].push(hid.t);
       } else {
-        info.result = 'die';
-        s.board[a.from] = null;
-        s.captured[att.c].push(att.t);
+        info.result = 'blocked'; // 攻擊的棋留在原地，翻開的敵棋也留著
       }
       s.last = info;
       if (info.result === 'capture' && remaining(s, hid.c) > 0 && chainTargets(s.board, a.to).length > 0) {
@@ -1150,7 +1148,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
       var rv = G.COLOR_NAME[l.revealed.c] + G.pieceName(l.revealed);
       text = who + '：' + G.pieceName(l.piece) + '攻暗棋翻出' + rv + (
         l.result === 'capture' ? '，吃掉' + (l.chain > 1 ? '（連吃 ' + l.chain + '）' : '') :
-        l.result === 'own' ? '（自己的棋），停止' : '，' + G.pieceName(l.piece) + '陣亡');
+        l.result === 'own' ? '（自己的棋），停止' : '，吃不下，停在原地');
     }
     else if (l.type === 'end') text = who + '結束連吃';
     else if (l.type === 'resign') text = who + '投降';
@@ -1308,7 +1306,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
     var lastCells = {};
     if (last.type === 'flip') lastCells[last.at] = 'flipped';
     if (last.type === 'move' || last.type === 'capture') { lastCells[last.from] = 'from'; lastCells[last.to] = 'moved'; }
-    if (last.type === 'attack') { lastCells[last.from] = last.result === 'die' ? 'died' : 'from'; lastCells[last.to] = last.result === 'capture' ? 'moved' : 'last'; }
+    if (last.type === 'attack') { lastCells[last.from] = 'from'; lastCells[last.to] = last.result === 'capture' ? 'moved' : 'last'; }
     if (last.type === 'reveal') { lastCells[last.from] = 'attacking'; lastCells[last.to] = 'flipped'; }
 
     // 畫面只在狀態改變時重建，才不會一直重播動畫

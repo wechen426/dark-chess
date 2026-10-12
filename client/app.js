@@ -138,7 +138,7 @@
       var rv = G.COLOR_NAME[l.revealed.c] + G.pieceName(l.revealed);
       text = who + '：' + G.pieceName(l.piece) + '攻暗棋翻出' + rv + (
         l.result === 'capture' ? '，吃掉' + (l.chain > 1 ? '（連吃 ' + l.chain + '）' : '') :
-        l.result === 'own' ? '（自己的棋），停止' : '，' + G.pieceName(l.piece) + '陣亡');
+        l.result === 'own' ? '（自己的棋），停止' : '，吃不下，停在原地');
     }
     else if (l.type === 'end') text = who + '結束連吃';
     else if (l.type === 'resign') text = who + '投降';
@@ -296,7 +296,7 @@
     var lastCells = {};
     if (last.type === 'flip') lastCells[last.at] = 'flipped';
     if (last.type === 'move' || last.type === 'capture') { lastCells[last.from] = 'from'; lastCells[last.to] = 'moved'; }
-    if (last.type === 'attack') { lastCells[last.from] = last.result === 'die' ? 'died' : 'from'; lastCells[last.to] = last.result === 'capture' ? 'moved' : 'last'; }
+    if (last.type === 'attack') { lastCells[last.from] = 'from'; lastCells[last.to] = last.result === 'capture' ? 'moved' : 'last'; }
     if (last.type === 'reveal') { lastCells[last.from] = 'attacking'; lastCells[last.to] = 'flipped'; }
 
     // 畫面只在狀態改變時重建，才不會一直重播動畫

@@ -247,7 +247,7 @@
       s.last = { type: 'flip', at: a.at, player: me, piece: { t: pc.t, c: pc.c } };
       endTurn(s);
     } else if (a.type === 'move' && s.board[a.to] && !s.board[a.to].up) {
-      // 連棋：攻擊暗棋。翻開後：可吃的敵棋→吃掉並可續攻；自己的棋→停止；比自己大的敵棋→己方陣亡
+      // 連棋：攻擊暗棋。翻開後：可吃的敵棋→吃掉並可續攻；自己的棋→停止；比自己大的敵棋→停在原地，回合結束
       var att = s.board[a.from], hid = s.board[a.to];
       hid.up = true;
       s.noProgress = 0;
@@ -259,9 +259,7 @@
         s.board[a.to] = att; s.board[a.from] = null;
         s.captured[hid.c].push(hid.t);
       } else {
-        info.result = 'die';
-        s.board[a.from] = null;
-        s.captured[att.c].push(att.t);
+        info.result = 'blocked'; // 攻擊的棋留在原地，翻開的敵棋也留著
       }
       s.last = info;
       if (info.result === 'capture' && remaining(s, hid.c) > 0 && chainTargets(s.board, a.to).length > 0) {

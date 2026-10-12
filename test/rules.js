@@ -48,10 +48,11 @@ assert.deepStrictEqual(s.captured.r, ['E', 'P', 'H']);
 s = setup('chain', [[0, 'r', 'R'], [1, 'r', 'P', false], [30, 'b', 'P', false]]);
 G.apply(s, { type: 'move', from: 0, to: 1 });
 assert.strictEqual(s.turn, 1); assert(s.board[0].t === 'R' && s.board[1].up && s.board[1].c === 'r');
-// 翻出比自己大的敵棋：己方陣亡
-s = setup('chain', [[0, 'r', 'K'], [1, 'b', 'P', false], [30, 'b', 'P', false]]);
+// 翻出比自己大的敵棋：停在原地，不陣亡
+s = setup('chain', [[0, 'r', 'A'], [1, 'b', 'K', false], [30, 'b', 'P', false]]);
 G.apply(s, { type: 'move', from: 0, to: 1 });
-assert.strictEqual(s.board[0], null); assert.deepStrictEqual(s.captured.r, ['K']); assert.strictEqual(s.turn, 1);
+assert.strictEqual(s.board[0].t, 'A'); assert(s.board[1].up && s.board[1].t === 'K');
+assert.deepStrictEqual(s.captured.r, []); assert.strictEqual(s.turn, 1); assert.strictEqual(s.last.result, 'blocked');
 // 兵攻暗棋翻出將：吃掉
 s = setup('chain', [[0, 'r', 'P'], [1, 'b', 'K', false], [30, 'b', 'P', false]]);
 G.apply(s, { type: 'move', from: 0, to: 1 });
