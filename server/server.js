@@ -16,6 +16,11 @@ const ROOT = path.join(__dirname, '..');
 const STATIC = {
   '/': 'index.html',
   '/index.html': 'index.html',
+  '/mahjong.html': 'mahjong.html',
+  '/client/mahjong.js': 'client/mahjong.js',
+  '/client/mahjong.css': 'client/mahjong.css',
+  '/shared/chessmahjong.js': 'shared/chessmahjong.js',
+  '/shared/chessmahjong-ai.js': 'shared/chessmahjong-ai.js',
   '/client/app.js': 'client/app.js',
   '/client/style.css': 'client/style.css',
   '/shared/engine.js': 'shared/engine.js',

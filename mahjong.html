@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>象棋麻將</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&family=Noto+Serif+TC:wght@900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="client/style.css">
+<link rel="stylesheet" href="client/mahjong.css">
+</head>
+<body>
+<!--APP-START-->
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>象棋麻將</h1>
+      <span>32 子型・2～4 人</span>
+    </div>
+    <!--NAV-START--><nav class="site-nav" aria-label="遊戲"><a href="/">暗棋連棋</a><a href="mahjong.html" aria-current="page">象棋麻將</a></nav><!--NAV-END-->
+  </header>
+
+  <main class="layout">
+    <section class="board-shell" aria-label="牌桌">
+      <div class="table" id="table">
+        <div class="center" id="center">
+          <div class="wall" id="wallInfo"></div>
+          <div class="msg" id="msg" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="actions" id="actions"></div>
+    </section>
+
+    <aside class="side">
+      <div class="card">
+        <h2>新牌局</h2>
+        <div class="field"><span class="lab">人數（你＋電腦）</span>
+          <div class="seg" id="playersSeg">
+            <button type="button" data-val="2">2 人</button>
+            <button type="button" data-val="3">3 人</button>
+            <button type="button" data-val="4">4 人</button>
+          </div>
+        </div>
+        <div class="row"><button class="btn primary" id="newMatch" type="button">開始新的一將</button></div>
+        <p class="note">每人輪流當一次莊稱為「一將」，一將打完結算總分。</p>
+      </div>
+
+      <div class="card">
+        <h2>紀錄</h2>
+        <ol class="log" id="log"></ol>
+      </div>
+
+      <div class="card">
+        <details class="rules">
+          <summary>規則說明</summary>
+          <ul>
+            <li>用一副象棋 32 子當牌：帥將各 1、兵卒各 5，其餘每種 2 張。</li>
+            <li>莊家拿 5 張、閒家 4 張，莊家先打一張，之後依逆時針輪流摸一張、打一張。</li>
+            <li>胡牌：手上湊成「一組面子＋一對」共 5 張；或湊滿「五兵」「五卒」。</li>
+            <li>順子：同色 <span class="rank">帥仕相、俥傌炮、將士象、車馬包</span>。刻子：同色同字三張（兵兵兵、卒卒卒）。槓子：四張。</li>
+            <li>對子：同色同字兩張，<span class="rank">帥將</span>也可以湊成一對。</li>
+            <li>吃：只能吃上家打的牌湊順子。碰、槓：任何人打的牌都可以。吃碰後不摸牌，直接打一張；槓完補摸一張。</li>
+            <li>同時有人要時，胡 &gt; 碰槓 &gt; 吃。</li>
+            <li>莊家胡牌或流局就連莊，否則換下家做莊；牌摸完沒人胡就流局。</li>
+            <li>計分（原規則沒有規定台數，這裡用簡單算法）：放槍胡，放槍的人付 1 分；自摸，其他每人各付 1 分。</li>
+          </ul>
+        </details>
+      </div>
+    </aside>
+  </main>
+</div>
+<!--APP-END-->
+<script src="shared/chessmahjong.js"></script>
+<script src="shared/chessmahjong-ai.js"></script>
+<script src="client/mahjong.js"></script>
+</body>
+</html>
