@@ -3,7 +3,7 @@
  *   node build.js
  * 輸出：dist/dark-chess.html（暗棋完整網頁）、dist/artifact.html（給 Claude Artifact 發布用，兩個遊戲在同一頁）、
  *       dist/chess-mahjong.html（象棋麻將完整網頁）
- * 單檔版本沒有其他頁面可連，會拿掉上方的遊戲切換列
+ * 單檔版本沒有其他頁面可連，上方的遊戲切換列會換成目前遊戲的名稱
  */
 'use strict';
 const fs = require('fs');
@@ -11,7 +11,8 @@ const path = require('path');
 const read = f => fs.readFileSync(path.join(__dirname, f), 'utf8');
 
 const appBody = page => read(page).match(/<!--APP-START-->([\s\S]*?)<!--APP-END-->/)[1];
-const stripNav = body => body.replace(/\n[ \t]*<!--NAV-START-->[\s\S]*?<!--NAV-END-->/, '');
+// 單檔版本沒有其他頁面可連：切換列換成目前遊戲的名稱
+const stripNav = body => body.replace(/<!--NAV-START-->[\s\S]*?aria-current="page">([^<]*)<\/a>[\s\S]*?<!--NAV-END-->/, '<span>$1</span>');
 
 function bundle(page, cssFiles, jsFiles) {
   const html = read(page);
@@ -52,7 +53,7 @@ const navSwitch = `
 const artifactCss = ['client/style.css', 'client/mahjong.css'].map(read).join('\n');
 const artifactJs = ['shared/engine.js', 'shared/ai.js', 'client/app.js', 'shared/chessmahjong.js', 'shared/chessmahjong-ai.js', 'client/mahjong.js'].map(read).join('\n') + navSwitch;
 const fontsLink = read('index.html').match(/<link rel="preconnect"[\s\S]*?display=swap">/)[0];
-const artifact = `<title>暗棋連棋・象棋麻將</title>\n${fontsLink}\n<style>\n${artifactCss}</style>\n` +
+const artifact = `<title>象棋好好玩</title>\n${fontsLink}\n<style>\n${artifactCss}</style>\n` +
   `<div data-game="chess">${appBody('index.html')}</div>\n<div data-game="mahjong" hidden>${appBody('mahjong.html')}</div>\n` +
   `<script>\n${artifactJs.replace(/<\/script/gi, '<\\/script')}\n</script>\n`;
 

@@ -1,4 +1,4 @@
-<title>暗棋連棋・象棋麻將</title>
+<title>象棋好好玩</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&family=Noto+Serif+TC:wght@900&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -67,7 +67,7 @@ header.top {
   justify-content: space-between;
   gap: 8px 16px;
 }
-.brand { display: flex; align-items: baseline; gap: 12px; }
+.brand { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
 .brand h1 {
   margin: 0;
   font-family: var(--font-piece);
@@ -372,7 +372,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
 }
 .tile.back::after { border-color: rgba(255,255,255,.25); opacity: 1; }
 .tile.sm { --sz: calc(var(--t) * .62); }
-.tile.xs { --sz: calc(var(--t) * .5); }
+.tile.xs { --sz: calc(var(--t) * .58); }
 .tile.last { box-shadow: 0 0 0 3px #ffd36b, 0 3px 6px rgba(0,0,0,.3); }
 .tile.win { box-shadow: 0 0 0 3px #ff8a6b, 0 3px 6px rgba(0,0,0,.3); }
 
@@ -384,15 +384,20 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
 .hand .tile:focus-visible { outline: 3px solid #ffd36b; outline-offset: 2px; }
 
 .center {
-  grid-area: center; display: grid; gap: 8px; align-content: center; justify-items: center;
-  min-height: calc(var(--t) * 3.6); padding: 8px; border-radius: 12px;
+  grid-area: center; display: grid; gap: 8px; align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, auto) minmax(0, 1fr);
+  grid-template-areas: "ptop ptop ptop" "pleft info pright" "pme pme pme";
+  min-height: calc(var(--t) * 3.6); padding: 10px; border-radius: 12px;
   background: rgba(0,0,0,.16); text-align: center;
 }
+.center-info { grid-area: info; display: grid; gap: 4px; justify-items: center; padding: 6px 8px; }
 .center .wall { font-family: var(--font-num); font-size: 13px; opacity: .85; }
 .center .msg { font-weight: 700; font-size: 15px; min-height: 1.5em; }
-.pond { display: flex; flex-wrap: wrap; gap: 3px; }
-.pos-right .pond { justify-content: flex-end; }
-.pos-top .pond, .pos-me .pond { justify-content: center; }
+.pond { display: flex; flex-wrap: wrap; gap: 3px; align-content: center; min-height: calc(var(--t) * .5); }
+.pond-top { grid-area: ptop; justify-content: center; }
+.pond-me { grid-area: pme; justify-content: center; }
+.pond-left { grid-area: pleft; justify-content: flex-start; }
+.pond-right { grid-area: pright; justify-content: flex-end; }
 
 .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 40px; align-items: center; }
 .actions .btn { display: inline-flex; align-items: center; gap: 6px; }
@@ -406,16 +411,17 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
 @media (max-width: 640px) {
   .table { --t: clamp(26px, 8vw, 40px); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "top top" "left right" "center center" "me me"; padding: 10px; }
   .seat.pos-right { justify-items: end; }
+  .center { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) minmax(0, 1fr); padding: 8px; }
+  .pond .tile.xs { --sz: 22px; }
 }
 </style>
 <div data-game="chess">
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>暗棋連棋</h1>
-      <span>台灣半盤暗棋・32 子・4 × 8</span>
+      <h1>象棋好好玩</h1>
+      <!--NAV-START--><nav class="site-nav" aria-label="選擇遊戲"><a href="/" aria-current="page">暗棋連棋</a><a href="mahjong.html">象棋麻將</a></nav><!--NAV-END-->
     </div>
-    <!--NAV-START--><nav class="site-nav" aria-label="遊戲"><a href="/" aria-current="page">暗棋連棋</a><a href="mahjong.html">象棋麻將</a></nav><!--NAV-END-->
     <div class="status" id="status" aria-live="polite"><span class="dot" id="statusDot"></span><span id="statusText">準備中</span></div>
   </header>
 
@@ -526,18 +532,19 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <h1>象棋麻將</h1>
-      <span>32 子型・2～4 人</span>
+      <h1>象棋好好玩</h1>
+      <!--NAV-START--><nav class="site-nav" aria-label="選擇遊戲"><a href="/">暗棋連棋</a><a href="mahjong.html" aria-current="page">象棋麻將</a></nav><!--NAV-END-->
     </div>
-    <!--NAV-START--><nav class="site-nav" aria-label="遊戲"><a href="/">暗棋連棋</a><a href="mahjong.html" aria-current="page">象棋麻將</a></nav><!--NAV-END-->
   </header>
 
   <main class="layout">
     <section class="board-shell" aria-label="牌桌">
       <div class="table" id="table">
         <div class="center" id="center">
-          <div class="wall" id="wallInfo"></div>
-          <div class="msg" id="msg" aria-live="polite"></div>
+          <div class="center-info">
+            <div class="wall" id="wallInfo"></div>
+            <div class="msg" id="msg" aria-live="polite"></div>
+          </div>
         </div>
       </div>
       <div class="actions" id="actions"></div>
@@ -2348,10 +2355,13 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
   // ---------- 畫面 ----------
   function render() {
     var table = $('table');
-    Array.prototype.slice.call(table.querySelectorAll('.seat, .result')).forEach(function (x) { x.remove(); });
+    Array.prototype.slice.call(table.querySelectorAll('.seat, .result, .pond')).forEach(function (x) { x.remove(); });
     var pos = positions(s.n);
     var lastTile = s.pending ? s.pending.tile : null;
-    for (var p = 0; p < s.n; p++) table.appendChild(seatEl(p, pos[p], lastTile));
+    for (var p = 0; p < s.n; p++) {
+      table.appendChild(seatEl(p, pos[p]));
+      $('center').appendChild(pondEl(p, pos[p], lastTile));
+    }
 
     $('wallInfo').textContent = '第 ' + match.hand + ' 局・牌牆剩 ' + s.wall.length + ' 張';
     var msg = '';
@@ -2365,7 +2375,7 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
     if (s.result) table.appendChild(resultEl());
   }
 
-  function seatEl(p, pos, lastTile) {
+  function seatEl(p, pos) {
     var seat = el('div', 'seat pos-' + pos);
     if (!s.result && s.turn === p && s.phase === 'discard') seat.classList.add('active');
     var head = el('div', 'seat-name');
@@ -2429,16 +2439,19 @@ details.rules ul { margin: 8px 0 0; padding-left: 1.2em; font-size: 13.5px; disp
       seat.appendChild(tiles);
     }
 
-    // 捨牌
-    var pond = el('div', 'pond');
+    return seat;
+  }
+
+  // 捨牌放在牌桌中間，朝向打牌那一家
+  function pondEl(p, pos, lastTile) {
+    var pond = el('div', 'pond pond-' + pos);
     pond.setAttribute('aria-label', seatName(p) + '的捨牌');
     s.discards[p].forEach(function (id) {
       var t = tileEl(id, 'xs');
       if (id === lastTile) t.classList.add('last');
       pond.appendChild(t);
     });
-    seat.appendChild(pond);
-    return seat;
+    return pond;
   }
 
   function renderActions() {

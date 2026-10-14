@@ -55,7 +55,7 @@
 }
 .tile.back::after { border-color: rgba(255,255,255,.25); opacity: 1; }
 .tile.sm { --sz: calc(var(--t) * .62); }
-.tile.xs { --sz: calc(var(--t) * .5); }
+.tile.xs { --sz: calc(var(--t) * .58); }
 .tile.last { box-shadow: 0 0 0 3px #ffd36b, 0 3px 6px rgba(0,0,0,.3); }
 .tile.win { box-shadow: 0 0 0 3px #ff8a6b, 0 3px 6px rgba(0,0,0,.3); }
 
@@ -67,15 +67,20 @@
 .hand .tile:focus-visible { outline: 3px solid #ffd36b; outline-offset: 2px; }
 
 .center {
-  grid-area: center; display: grid; gap: 8px; align-content: center; justify-items: center;
-  min-height: calc(var(--t) * 3.6); padding: 8px; border-radius: 12px;
+  grid-area: center; display: grid; gap: 8px; align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, auto) minmax(0, 1fr);
+  grid-template-areas: "ptop ptop ptop" "pleft info pright" "pme pme pme";
+  min-height: calc(var(--t) * 3.6); padding: 10px; border-radius: 12px;
   background: rgba(0,0,0,.16); text-align: center;
 }
+.center-info { grid-area: info; display: grid; gap: 4px; justify-items: center; padding: 6px 8px; }
 .center .wall { font-family: var(--font-num); font-size: 13px; opacity: .85; }
 .center .msg { font-weight: 700; font-size: 15px; min-height: 1.5em; }
-.pond { display: flex; flex-wrap: wrap; gap: 3px; }
-.pos-right .pond { justify-content: flex-end; }
-.pos-top .pond, .pos-me .pond { justify-content: center; }
+.pond { display: flex; flex-wrap: wrap; gap: 3px; align-content: center; min-height: calc(var(--t) * .5); }
+.pond-top { grid-area: ptop; justify-content: center; }
+.pond-me { grid-area: pme; justify-content: center; }
+.pond-left { grid-area: pleft; justify-content: flex-start; }
+.pond-right { grid-area: pright; justify-content: flex-end; }
 
 .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 40px; align-items: center; }
 .actions .btn { display: inline-flex; align-items: center; gap: 6px; }
@@ -89,4 +94,6 @@
 @media (max-width: 640px) {
   .table { --t: clamp(26px, 8vw, 40px); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "top top" "left right" "center center" "me me"; padding: 10px; }
   .seat.pos-right { justify-items: end; }
+  .center { grid-template-columns: minmax(0, 1fr) minmax(96px, auto) minmax(0, 1fr); padding: 8px; }
+  .pond .tile.xs { --sz: 22px; }
 }

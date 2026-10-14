@@ -1,4 +1,4 @@
-# 暗棋連棋（Dark Chess Chain）
+# 象棋好好玩（Dark Chess Chain）
 
 同一個網站有兩個遊戲，頁面上方可以切換：
 

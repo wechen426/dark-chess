@@ -153,10 +153,13 @@
   // ---------- 畫面 ----------
   function render() {
     var table = $('table');
-    Array.prototype.slice.call(table.querySelectorAll('.seat, .result')).forEach(function (x) { x.remove(); });
+    Array.prototype.slice.call(table.querySelectorAll('.seat, .result, .pond')).forEach(function (x) { x.remove(); });
     var pos = positions(s.n);
     var lastTile = s.pending ? s.pending.tile : null;
-    for (var p = 0; p < s.n; p++) table.appendChild(seatEl(p, pos[p], lastTile));
+    for (var p = 0; p < s.n; p++) {
+      table.appendChild(seatEl(p, pos[p]));
+      $('center').appendChild(pondEl(p, pos[p], lastTile));
+    }
 
     $('wallInfo').textContent = '第 ' + match.hand + ' 局・牌牆剩 ' + s.wall.length + ' 張';
     var msg = '';
@@ -170,7 +173,7 @@
     if (s.result) table.appendChild(resultEl());
   }
 
-  function seatEl(p, pos, lastTile) {
+  function seatEl(p, pos) {
     var seat = el('div', 'seat pos-' + pos);
     if (!s.result && s.turn === p && s.phase === 'discard') seat.classList.add('active');
     var head = el('div', 'seat-name');
@@ -234,16 +237,19 @@
       seat.appendChild(tiles);
     }
 
-    // 捨牌
-    var pond = el('div', 'pond');
+    return seat;
+  }
+
+  // 捨牌放在牌桌中間，朝向打牌那一家
+  function pondEl(p, pos, lastTile) {
+    var pond = el('div', 'pond pond-' + pos);
     pond.setAttribute('aria-label', seatName(p) + '的捨牌');
     s.discards[p].forEach(function (id) {
       var t = tileEl(id, 'xs');
       if (id === lastTile) t.classList.add('last');
       pond.appendChild(t);
     });
-    seat.appendChild(pond);
-    return seat;
+    return pond;
   }
 
   function renderActions() {
