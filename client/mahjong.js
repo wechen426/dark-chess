@@ -272,7 +272,7 @@
   }
 
   function renderLog() {
-    var log = $('log');
+    var log = $('mjLog');
     log.innerHTML = '';
     logItems.forEach(function (t, i) {
       var li = el('li');
